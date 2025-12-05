@@ -13,7 +13,7 @@ interface ProductFormModalProps {
 
 const CloseIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
   </svg>
 );
 
@@ -75,7 +75,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ isOpen, onCl
     const productData = {
       ...formData,
       notes: formData.notes.split(',').map(note => note.trim()),
-      collection: formData.collection || undefined, // Garante que seja undefined se vazio
+      collection: formData.collection || undefined,
     };
     if (product) {
       onSave({ ...product, ...productData });
@@ -86,71 +86,71 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ isOpen, onCl
 
   if (!isOpen) return null;
   
-  const defaultSelectClass = "mt-1 block w-full bg-gray-800 border-gray-700 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-gold";
+  const inputClass = "w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-light text-sm";
+  const labelClass = "block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2";
 
   return (
     <div 
-      className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-opacity duration-300"
+      className="fixed inset-0 bg-black/90 backdrop-blur-md z-[60] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div 
-        className="bg-brand-dark border border-brand-gold/30 rounded-lg shadow-gold-glow-lg w-full max-w-2xl p-8 relative transform transition-all duration-300 scale-95 opacity-0 animate-fade-in-scale max-h-[90vh] overflow-y-auto"
+        className="glass-panel w-full max-w-2xl p-8 rounded-3xl relative animate-[fade-in-up_0.3s_forwards] max-h-[90vh] overflow-y-auto custom-scrollbar"
         onClick={(e) => e.stopPropagation()}
-        style={{ animation: 'fade-in-scale 0.3s forwards' }}
       >
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-brand-gold">
+        <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-brand-gold transition-colors">
           <CloseIcon />
         </button>
         
-        <h2 className="text-3xl font-bold text-center text-brand-gold mb-6">
-          {product ? 'Editar Perfume' : 'Adicionar Novo Perfume'}
+        <h2 className="text-2xl font-light text-white mb-8 tracking-wide border-b border-white/10 pb-4">
+          {product ? 'Editar Perfume' : 'Adicionar Novo'}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-300">Nome</label>
-              <input id="name" name="name" type="text" value={formData.name} onChange={handleChange} required className={defaultSelectClass} />
+              <label htmlFor="name" className={labelClass}>Nome</label>
+              <input id="name" name="name" type="text" value={formData.name} onChange={handleChange} required className={inputClass} />
             </div>
             <div>
-              <label htmlFor="brand" className="block text-sm font-medium text-gray-300">Marca</label>
-              <select id="brand" name="brand" value={formData.brand} onChange={handleChange} required className={defaultSelectClass}>
+              <label htmlFor="brand" className={labelClass}>Marca</label>
+              <select id="brand" name="brand" value={formData.brand} onChange={handleChange} required className={inputClass}>
                 <option value="" disabled>Selecione uma marca</option>
                 {brands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
               </select>
             </div>
              <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-300">Categoria</label>
-              <input id="category" name="category" type="text" value={formData.category} onChange={handleChange} required className={defaultSelectClass} />
+              <label htmlFor="category" className={labelClass}>Categoria</label>
+              <input id="category" name="category" type="text" value={formData.category} onChange={handleChange} required className={inputClass} />
             </div>
             <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-300">Preço</label>
-              <input id="price" name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} required className={defaultSelectClass} />
+              <label htmlFor="price" className={labelClass}>Preço</label>
+              <input id="price" name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} required className={inputClass} />
             </div>
             <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-300">Gênero</label>
-                <select id="gender" name="gender" value={formData.gender} onChange={handleChange} required className={defaultSelectClass}>
+                <label htmlFor="gender" className={labelClass}>Gênero</label>
+                <select id="gender" name="gender" value={formData.gender} onChange={handleChange} required className={inputClass}>
                     <option value="Unissex">Unissex</option>
                     <option value="Masculino">Masculino</option>
                     <option value="Feminino">Feminino</option>
                 </select>
             </div>
              <div>
-              <label htmlFor="collection" className="block text-sm font-medium text-gray-300">Coleção</label>
-              <select id="collection" name="collection" value={formData.collection} onChange={handleChange} className={defaultSelectClass}>
+              <label htmlFor="collection" className={labelClass}>Coleção</label>
+              <select id="collection" name="collection" value={formData.collection} onChange={handleChange} className={inputClass}>
                 <option value="">Nenhuma</option>
                 {collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
           </div>
-           <div>
-            <label className="block text-sm font-medium text-gray-300">Imagem do Produto</label>
-            <div className="mt-2 flex items-center space-x-4">
+           <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+            <label className={labelClass}>Imagem do Produto</label>
+            <div className="mt-3 flex items-center space-x-4">
               {formData.image && (
-                <img src={formData.image} alt="Pré-visualização" className="h-24 w-24 rounded-md object-cover border-2 border-brand-gold/50" />
+                <img src={formData.image} alt="Preview" className="h-20 w-20 rounded-lg object-cover border border-white/20" />
               )}
-              <label htmlFor="image-upload" className="cursor-pointer bg-gray-700 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors">
-                {formData.image ? 'Alterar Imagem' : 'Selecionar Imagem'}
+              <label htmlFor="image-upload" className="cursor-pointer bg-white/10 text-brand-gold font-bold py-2 px-4 rounded-lg hover:bg-brand-gold hover:text-black transition-colors text-sm uppercase tracking-wide">
+                {formData.image ? 'Alterar' : 'Upload'}
               </label>
               <input 
                 id="image-upload" 
@@ -163,29 +163,20 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ isOpen, onCl
             </div>
           </div>
           <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-300">Notas (separadas por vírgula)</label>
-            <input id="notes" name="notes" type="text" value={formData.notes} onChange={handleChange} required className={defaultSelectClass} />
+            <label htmlFor="notes" className={labelClass}>Notas (separadas por vírgula)</label>
+            <input id="notes" name="notes" type="text" value={formData.notes} onChange={handleChange} required className={inputClass} />
           </div>
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-300">Descrição</label>
-            <textarea id="description" name="description" value={formData.description} onChange={handleChange} required rows={4} className={defaultSelectClass} />
+            <label htmlFor="description" className={labelClass}>Descrição</label>
+            <textarea id="description" name="description" value={formData.description} onChange={handleChange} required rows={3} className={inputClass} />
           </div>
 
-          <div className="pt-4 flex justify-end">
-            <button type="button" onClick={onClose} className="bg-gray-700 text-white font-bold py-2 px-6 rounded-md hover:bg-gray-600 transition-colors mr-3 active:scale-95">Cancelar</button>
-            <button type="submit" className="bg-brand-gold text-black font-bold py-2 px-6 rounded-md hover:bg-yellow-400 transition-all duration-300 shadow-gold-glow active:scale-95">Salvar</button>
+          <div className="pt-6 flex justify-end gap-3 border-t border-white/10 mt-6">
+            <button type="button" onClick={onClose} className="px-6 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors text-sm font-medium">Cancelar</button>
+            <button type="submit" className="bg-brand-gold text-black font-bold py-3 px-8 rounded-lg hover:bg-brand-gold-light transition-all shadow-gold-glow active:scale-95">Salvar</button>
           </div>
         </form>
       </div>
-      <style>{`
-        @keyframes fade-in-scale {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-in-scale {
-          animation: fade-in-scale 0.3s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 };

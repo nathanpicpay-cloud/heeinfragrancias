@@ -7,44 +7,57 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onAdminLoginClick }) => {
   return (
-    <footer className="bg-black border-t border-brand-gold/20 mt-16">
-      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="text-xl font-bold text-brand-gold mb-4">Heein Fragrâncias</h3>
-            <p className="text-gray-400">Essências dos melhores perfumes do mundo.</p>
+    <footer className="relative mt-20 border-t border-white/5 bg-black/80 backdrop-blur-md">
+      <div className="container mx-auto py-16 px-6 lg:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+          
+          <div className="space-y-4">
+             <span className="text-2xl font-light tracking-[0.2em] text-white">
+                HE<span className="text-transparent bg-clip-text bg-gold-gradient font-bold">EIN</span>
+            </span>
+            <p className="text-gray-400 font-light text-sm leading-relaxed max-w-xs">
+              A curadoria definitiva de essências luxuosas. Transformando a presença em uma assinatura inesquecível.
+            </p>
           </div>
+          
           <div>
-            <h4 className="font-semibold text-white tracking-wider uppercase mb-4">Links</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-brand-gold transition-colors">Sobre Nós</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-brand-gold transition-colors">Contato</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-brand-gold transition-colors">Política de Privacidade</a></li>
+            <h4 className="text-sm font-bold text-white tracking-widest uppercase mb-6 text-transparent bg-clip-text bg-gold-gradient">Links</h4>
+            <ul className="space-y-3 text-sm font-light">
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">Sobre Nós</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">Contato</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">Privacidade</a></li>
             </ul>
           </div>
+          
           <div>
-            <h4 className="font-semibold text-white tracking-wider uppercase mb-4">Ajuda</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-brand-gold transition-colors">FAQ</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-brand-gold transition-colors">Rastreio</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-brand-gold transition-colors">Trocas e Devoluções</a></li>
+            <h4 className="text-sm font-bold text-white tracking-widest uppercase mb-6 text-transparent bg-clip-text bg-gold-gradient">Suporte</h4>
+            <ul className="space-y-3 text-sm font-light">
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">FAQ</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">Rastreamento</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">Devoluções</a></li>
             </ul>
           </div>
+          
           <div>
-            <h4 className="font-semibold text-white tracking-wider uppercase mb-4">Newsletter</h4>
-            <p className="text-gray-400 mb-2">Receba ofertas exclusivas.</p>
-            <form className="flex">
-              <input type="email" placeholder="Seu e-mail" className="w-full bg-gray-800 border border-gray-700 text-white px-3 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-brand-gold" />
-              <button type="submit" className="bg-brand-gold text-black font-bold px-4 py-2 rounded-r-md hover:bg-yellow-400 transition-colors">
+            <h4 className="text-sm font-bold text-white tracking-widest uppercase mb-6 text-transparent bg-clip-text bg-gold-gradient">Newsletter</h4>
+            <p className="text-gray-400 text-sm font-light mb-4">Acesso exclusivo a lançamentos.</p>
+            <form className="flex group">
+              <input 
+                type="email" 
+                placeholder="Seu e-mail" 
+                className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 text-sm rounded-l-lg focus:outline-none focus:border-brand-gold/50 transition-all placeholder-gray-600 font-light" 
+              />
+              <button type="submit" className="bg-white/10 border border-l-0 border-white/10 text-brand-gold px-5 py-3 rounded-r-lg hover:bg-brand-gold hover:text-black transition-all duration-300">
                 ›
               </button>
             </form>
           </div>
         </div>
-        <div className="mt-8 border-t border-gray-800 pt-8 text-center text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Heein Fragrâncias. Todos os direitos reservados.</p>
-          <button onClick={onAdminLoginClick} className="text-xs text-gray-600 hover:text-brand-gold mt-2 transition-colors">
-            Acesso Admin
+        
+        <div className="mt-16 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 font-light">
+          <p>&copy; {new Date().getFullYear()} Heein Fragrâncias. Luxo Redefinido.</p>
+          <button onClick={onAdminLoginClick} className="mt-4 md:mt-0 opacity-50 hover:opacity-100 hover:text-brand-gold transition-opacity">
+            Acesso Restrito
           </button>
         </div>
       </div>

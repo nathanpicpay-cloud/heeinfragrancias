@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import type { Page, Product, CartItem, User, Brand, Collection, SiteSettings, AppData } from './types';
 import { PRODUCTS as PRODUCTS_DATA, BRANDS as BRANDS_DATA, COLLECTIONS as COLLECTIONS_DATA } from './constants';
 import { Header } from './components/Header';
@@ -10,6 +10,40 @@ import { AdminPanel } from './components/AdminPanel';
 import { FlyingProductAnimator } from './components/FlyingProductAnimator';
 import { WhatsAppButton } from './components/WhatsAppButton';
 
+// --- Scroll Reveal Helper Component ---
+const RevealOnScroll: React.FC<{ children: ReactNode; className?: string; delay?: number }> = ({ children, className = "", delay = 0 }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.disconnect();
+                }
+            },
+            { threshold: 0.1 }
+        );
+        if (ref.current) observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, []);
+
+    const style = {
+        transitionDelay: `${delay}ms`,
+    };
+
+    return (
+        <div 
+            ref={ref} 
+            className={`transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'} ${className}`}
+            style={style}
+        >
+            {children}
+        </div>
+    );
+};
+
 type Filters = {
     brands: string[];
     genders: string[];
@@ -18,18 +52,51 @@ type Filters = {
 }
 
 const HeroSection: React.FC<{ onNavigate: (page: Page, param?: string) => void; heroImage: string }> = ({ onNavigate, heroImage }) => (
-    <div className="relative h-[60vh] md:h-[80vh] bg-cover bg-center flex items-center justify-center text-center" style={{ backgroundImage: `url('${heroImage}')` }}>
-        <div className="absolute inset-0 bg-black/60"></div>
-        <div className="relative z-10 px-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-white tracking-wider leading-tight">Heein Fragrâncias</h1>
-            <p className="mt-4 text-lg md:text-xl text-gray-300">Essências dos melhores perfumes do mundo.</p>
-            <button
-                onClick={() => onNavigate('products')}
-                className="mt-8 bg-brand-gold text-black font-bold py-3 px-8 rounded-md hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 shadow-gold-glow active:scale-100"
-            >
-                Catálogo
-            </button>
+    <div className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+        {/* Background with slow zoom animation */}
+        <div 
+            className="absolute inset-0 bg-cover bg-center animate-[shimmer_20s_infinite_alternate]" 
+            style={{ 
+                backgroundImage: `url('${heroImage}')`,
+                animation: 'scale-up-center 30s ease-in-out infinite alternate',
+                transformOrigin: 'center center'
+            }} 
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-[#050505]"></div>
+        
+        <div className="relative z-10 px-6 max-w-5xl mx-auto text-center">
+            <RevealOnScroll>
+                <h2 className="text-brand-gold-light text-sm md:text-base font-medium tracking-[0.3em] uppercase mb-4 opacity-90">
+                    Alta Perfumaria
+                </h2>
+            </RevealOnScroll>
+            <RevealOnScroll delay={200}>
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white tracking-wide leading-tight mb-8 drop-shadow-lg">
+                    A Essência do <br />
+                    <span className="font-semibold text-transparent bg-clip-text bg-gold-gradient italic">Absoluto</span>
+                </h1>
+            </RevealOnScroll>
+            <RevealOnScroll delay={400}>
+                <p className="text-lg md:text-xl text-gray-200 font-light max-w-2xl mx-auto mb-12 opacity-80 leading-relaxed">
+                    Descubra fragrâncias que transcendem o tempo. Uma coleção curada das essências mais raras e exclusivas do mundo.
+                </p>
+            </RevealOnScroll>
+            <RevealOnScroll delay={600}>
+                <button
+                    onClick={() => onNavigate('products')}
+                    className="group relative px-10 py-4 bg-transparent overflow-hidden rounded-full border border-brand-gold/50 hover:border-brand-gold transition-colors duration-300"
+                >
+                    <div className="absolute inset-0 w-0 bg-brand-gold transition-all duration-[250ms] ease-out group-hover:w-full opacity-10"></div>
+                    <span className="relative text-brand-gold group-hover:text-white font-medium tracking-widest uppercase text-sm">Explorar Coleção</span>
+                </button>
+            </RevealOnScroll>
         </div>
+        <style>{`
+            @keyframes scale-up-center {
+                0% { transform: scale(1); }
+                100% { transform: scale(1.1); }
+            }
+        `}</style>
     </div>
 );
 
@@ -43,11 +110,19 @@ const HomePage: React.FC<{ products: Product[]; onViewProduct: (product: Product
     return (
         <>
             <HeroSection onNavigate={onNavigate} heroImage={siteSettings.heroImage} />
-            <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <main className="container mx-auto px-6 lg:px-12 py-24">
                 <section>
-                    <h2 className="text-3xl font-bold text-center mb-8 text-brand-gold tracking-wide">Mais Vendidos</h2>
+                    <RevealOnScroll>
+                        <div className="flex flex-col items-center mb-16">
+                            <h2 className="text-3xl md:text-4xl font-light text-white tracking-[0.1em] text-center">
+                                Mais <span className="font-semibold text-transparent bg-clip-text bg-gold-gradient">Desejados</span>
+                            </h2>
+                            <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-brand-gold to-transparent mt-6"></div>
+                        </div>
+                    </RevealOnScroll>
+                    
                     <div className="relative w-full overflow-hidden group">
-                        <div className="flex w-max space-x-6 animate-scroll-x pause-animation">
+                        <div className="flex w-max space-x-8 animate-scroll-x pause-animation py-10">
                             {/* Duplicate content for seamless loop */}
                             {bestSellers.map((product) => (
                                 <div key={product.id} className="flex-shrink-0 w-72">
@@ -60,9 +135,37 @@ const HomePage: React.FC<{ products: Product[]; onViewProduct: (product: Product
                                 </div>
                             ))}
                         </div>
-                         <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-brand-dark to-transparent pointer-events-none"></div>
-                         <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-brand-dark to-transparent pointer-events-none"></div>
+                         <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050505] to-transparent pointer-events-none z-10"></div>
+                         <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050505] to-transparent pointer-events-none z-10"></div>
                     </div>
+                </section>
+                
+                {/* Feature Section */}
+                <section className="mt-32">
+                    <RevealOnScroll>
+                        <div className="glass-panel rounded-3xl p-12 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-brand-gold/10 rounded-full blur-[100px]"></div>
+                            <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px]"></div>
+                            
+                            <div className="grid md:grid-cols-2 gap-12 items-center relative z-10">
+                                <div>
+                                    <h3 className="text-3xl font-light text-white mb-6">Coleção <span className="italic font-serif text-brand-gold">Árabe</span> Exclusiva</h3>
+                                    <p className="text-gray-400 font-light leading-relaxed mb-8">
+                                        Mergulhe na opulência do Oriente. Notas de Oud, Especiarias raras e Âmbar que contam histórias milenares. Uma seleção para quem busca o extraordinário.
+                                    </p>
+                                    <button 
+                                        onClick={() => onNavigate('collection', 'colecao_arabe')}
+                                        className="text-white border-b border-brand-gold pb-1 hover:text-brand-gold transition-colors duration-300 tracking-widest text-sm uppercase"
+                                    >
+                                        Descobrir Coleção
+                                    </button>
+                                </div>
+                                <div className="rounded-2xl overflow-hidden h-80 relative shadow-2xl">
+                                    <img src="https://i.imgur.com/WDpriz2.jpeg" alt="Coleção Árabe" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-1000" />
+                                </div>
+                            </div>
+                        </div>
+                    </RevealOnScroll>
                 </section>
             </main>
         </>
@@ -76,22 +179,27 @@ const CollectionPage: React.FC<{
     onViewProduct: (product: Product) => void;
     onAddToCart: (product: Product, imageElement: HTMLImageElement) => void;
 }> = ({ products, collections, collectionId, onViewProduct, onAddToCart }) => {
-    if (!collectionId) return <p>Coleção não encontrada.</p>;
+    if (!collectionId) return <div className="min-h-screen flex items-center justify-center text-gray-400">Coleção não encontrada.</div>;
     
     const collectionProducts = products.filter(p => p.collection === collectionId);
     const details = collections.find(c => c.id === collectionId);
     
-    if (!details) return <p>Detalhes da coleção não encontrados.</p>;
+    if (!details) return <div className="min-h-screen flex items-center justify-center text-gray-400">Detalhes não encontrados.</div>;
 
     return (
-         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="text-center mb-10">
-                <h1 className="text-4xl font-bold text-brand-gold tracking-wide">{details.name}</h1>
-                <p className="mt-2 text-lg text-gray-300 max-w-3xl mx-auto">{details.description}</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {collectionProducts.map(product => (
-                    <ProductCard key={product.id} product={product} onViewProduct={onViewProduct} onAddToCart={onAddToCart} />
+         <main className="container mx-auto px-6 lg:px-12 py-24 min-h-screen">
+            <RevealOnScroll>
+                <div className="text-center mb-20">
+                    <span className="text-brand-gold text-xs font-bold tracking-[0.3em] uppercase block mb-4">Coleção Exclusiva</span>
+                    <h1 className="text-4xl md:text-5xl font-light text-white tracking-wide mb-6">{details.name}</h1>
+                    <p className="text-lg text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">{details.description}</p>
+                </div>
+            </RevealOnScroll>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {collectionProducts.map((product, index) => (
+                    <RevealOnScroll key={product.id} delay={index * 50}>
+                        <ProductCard product={product} onViewProduct={onViewProduct} onAddToCart={onAddToCart} />
+                    </RevealOnScroll>
                 ))}
             </div>
         </main>
@@ -123,37 +231,39 @@ const FilterSidebar: React.FC<{
     const hasActiveFilters = filters.brands.length > 0 || filters.genders.length > 0 || filters.categories.length > 0;
 
     const FilterSection: React.FC<{title: string; children: React.ReactNode}> = ({title, children}) => (
-        <div className="py-4 border-b border-gray-800">
-            <h3 className="font-semibold text-white mb-2">{title}</h3>
-            <div className="space-y-2 max-h-60 overflow-y-auto pr-2">{children}</div>
+        <div className="py-6 border-b border-white/5 last:border-0">
+            <h3 className="font-medium text-white/90 mb-4 tracking-wide text-sm uppercase">{title}</h3>
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">{children}</div>
         </div>
     );
 
     const Checkbox: React.FC<{label: string; checked: boolean; onChange: () => void}> = ({label, checked, onChange}) => (
-         <label className="flex items-center space-x-2 text-gray-300 hover:text-brand-gold cursor-pointer">
-            <input type="checkbox" checked={checked} onChange={onChange} className="h-4 w-4 rounded bg-gray-700 border-gray-600 text-brand-gold focus:ring-brand-gold" />
-            <span>{label}</span>
+         <label className="flex items-center space-x-3 text-gray-400 hover:text-brand-gold cursor-pointer group transition-colors">
+            <div className={`w-4 h-4 border border-gray-600 rounded flex items-center justify-center transition-all ${checked ? 'bg-brand-gold border-brand-gold' : 'group-hover:border-brand-gold'}`}>
+                {checked && <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+            </div>
+            <span className="font-light text-sm">{label}</span>
         </label>
     );
 
     return (
-        <aside className="w-full md:w-64 lg:w-72 flex-shrink-0">
-            <div className="sticky top-24">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-brand-gold">Filtros</h2>
+        <aside className="w-full md:w-72 lg:w-80 flex-shrink-0">
+            <div className="sticky top-28 glass-panel rounded-2xl p-6">
+                <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                    <h2 className="text-lg font-light text-white tracking-widest uppercase">Filtros</h2>
                     {hasActiveFilters && (
-                        <button onClick={clearFilters} className="text-sm text-gray-400 hover:text-white">Limpar</button>
+                        <button onClick={clearFilters} className="text-xs text-brand-gold hover:text-white transition-colors underline decoration-brand-gold/50">Limpar</button>
                     )}
                 </div>
-                <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+                <div className="">
                     <FilterSection title="Gênero">
                         {allGenders.map(gender => <Checkbox key={gender} label={gender} checked={filters.genders.includes(gender)} onChange={() => handleCheckboxChange('genders', gender)} />)}
                     </FilterSection>
-                    <FilterSection title="Marca">
-                        {brands.map(brand => <Checkbox key={brand.id} label={brand.name} checked={filters.brands.includes(brand.name)} onChange={() => handleCheckboxChange('brands', brand.name)} />)}
-                    </FilterSection>
                     <FilterSection title="Estilo Olfativo">
                          {allCategories.map(category => <Checkbox key={category} label={category} checked={filters.categories.includes(category)} onChange={() => handleCheckboxChange('categories', category)} />)}
+                    </FilterSection>
+                    <FilterSection title="Marca">
+                        {brands.map(brand => <Checkbox key={brand.id} label={brand.name} checked={filters.brands.includes(brand.name)} onChange={() => handleCheckboxChange('brands', brand.name)} />)}
                     </FilterSection>
                 </div>
             </div>
@@ -185,7 +295,7 @@ const ProductListPage: React.FC<{
     }
 
     if (searchQuery) {
-        const query = searchQuery.toLowerCase();
+        const query = String(searchQuery).toLowerCase();
         filteredProducts = filteredProducts.filter(p => 
             p.name.toLowerCase().includes(query) ||
             p.brand.toLowerCase().includes(query) ||
@@ -196,39 +306,53 @@ const ProductListPage: React.FC<{
     }
     
     const title = searchQuery
-        ? `Resultados para "${searchQuery}"` 
-        : "Nosso Catálogo";
+        ? `Resultados: "${searchQuery}"` 
+        : "Catálogo Completo";
 
     return (
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <h1 className="text-4xl font-bold text-center mb-10 text-brand-gold tracking-wide">{title}</h1>
+        <main className="container mx-auto px-6 lg:px-12 py-24 min-h-screen">
+             <RevealOnScroll>
+                <div className="flex flex-col items-center mb-16">
+                    <h1 className="text-3xl md:text-5xl font-light text-white tracking-tight text-center mb-8">{title}</h1>
+                    <div className="w-full max-w-2xl relative group">
+                         <div className="absolute -inset-1 bg-gradient-to-r from-brand-gold/20 via-white/10 to-brand-gold/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                        <input 
+                            type="text"
+                            placeholder="Buscar essências..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="relative w-full bg-black/50 border border-white/10 text-white px-6 py-4 rounded-xl focus:outline-none focus:border-brand-gold/50 focus:bg-black/70 transition-all duration-300 placeholder-gray-500 font-light backdrop-blur-md"
+                        />
+                         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                         </div>
+                    </div>
+                </div>
+            </RevealOnScroll>
 
-            <div className="mb-8 max-w-3xl mx-auto">
-                <input 
-                    type="text"
-                    placeholder="Pesquisar por nome, marca, estilo olfativo..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-gray-900/50 border-2 border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all duration-300 placeholder-gray-500"
-                />
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
-                <FilterSidebar
-                    brands={brands}
-                    products={products}
-                    filters={filters}
-                    onFilterChange={setFilters}
-                />
+            <div className="flex flex-col md:flex-row gap-8 lg:gap-16">
+                <RevealOnScroll className="md:sticky md:top-24 h-fit">
+                    <FilterSidebar
+                        brands={brands}
+                        products={products}
+                        filters={filters}
+                        onFilterChange={setFilters}
+                    />
+                </RevealOnScroll>
                 <div className="flex-1">
                     {filteredProducts.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredProducts.map(product => (
-                                <ProductCard key={product.id} product={product} onViewProduct={onViewProduct} onAddToCart={onAddToCart} />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredProducts.map((product, index) => (
+                                <RevealOnScroll key={product.id} delay={index * 50}>
+                                    <ProductCard product={product} onViewProduct={onViewProduct} onAddToCart={onAddToCart} />
+                                </RevealOnScroll>
                             ))}
                         </div>
                     ) : (
-                        <p className="text-center text-gray-400 text-lg pt-10">Nenhum perfume encontrado com os filtros selecionados.</p>
+                         <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+                             <p className="text-xl font-light">Nenhuma fragrância encontrada.</p>
+                             <button onClick={() => {setSearchQuery(''); setFilters({brands: [], genders: [], categories: [], maxPrice: null})}} className="mt-4 text-brand-gold hover:underline">Limpar filtros</button>
+                         </div>
                     )}
                 </div>
             </div>
@@ -241,26 +365,56 @@ const ProductDetailPage: React.FC<{ product: Product, onAddToCart: (product: Pro
     const imageRef = useRef<HTMLImageElement>(null);
 
     return (
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="grid md:grid-cols-2 gap-12 items-start">
-                <div>
-                    <img ref={imageRef} src={product.image} alt={product.name} className="w-full rounded-lg shadow-gold-glow-lg"/>
-                </div>
-                <div>
-                    <h1 className="text-4xl font-bold text-brand-gold">{product.name}</h1>
-                    <p className="text-xl text-gray-300 mt-1">{product.brand}</p>
-                    <p className="text-gray-400 mt-2">{product.gender} / {product.category}</p>
-                    <p className="text-3xl font-bold text-white my-4">R$ {product.price.toFixed(2).replace('.', ',')}</p>
-                    <p className="text-gray-400 leading-relaxed">{product.description}</p>
-                    <div className="mt-6">
-                        <h3 className="text-lg font-semibold text-white">Notas Olfativas:</h3>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {product.notes.map(note => <span key={note} className="bg-gray-800 text-brand-gold text-sm font-medium px-3 py-1 rounded-full">{note}</span>)}
-                        </div>
+        <main className="container mx-auto px-6 lg:px-12 py-24 min-h-screen flex items-center">
+            <div className="glass-panel rounded-3xl p-8 lg:p-12 w-full">
+                <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
+                    <RevealOnScroll className="relative group">
+                         <div className="absolute inset-0 bg-brand-gold/20 rounded-2xl blur-[50px] opacity-0 group-hover:opacity-30 transition duration-1000"></div>
+                        <img ref={imageRef} src={product.image} alt={product.name} className="w-full rounded-2xl shadow-2xl relative z-10 transform transition duration-700 hover:scale-[1.02]"/>
+                    </RevealOnScroll>
+                    
+                    <div className="space-y-8">
+                        <RevealOnScroll delay={100}>
+                            <h3 className="text-brand-gold text-sm font-bold tracking-[0.2em] uppercase mb-2">{product.brand}</h3>
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-white leading-tight">{product.name}</h1>
+                            <div className="flex items-center gap-4 mt-4 text-gray-400 font-light text-sm">
+                                <span className="px-3 py-1 border border-white/10 rounded-full">{product.gender}</span>
+                                <span className="px-3 py-1 border border-white/10 rounded-full">{product.category}</span>
+                            </div>
+                        </RevealOnScroll>
+
+                        <RevealOnScroll delay={200}>
+                             <p className="text-4xl font-light text-white my-6">
+                                R$ <span className="font-medium">{product.price.toFixed(2).replace('.', ',')}</span>
+                            </p>
+                        </RevealOnScroll>
+
+                        <RevealOnScroll delay={300}>
+                            <p className="text-gray-300 font-light leading-relaxed text-lg">{product.description}</p>
+                        </RevealOnScroll>
+
+                        <RevealOnScroll delay={400}>
+                            <div className="space-y-3">
+                                <h3 className="text-sm font-medium text-white uppercase tracking-widest">Notas Olfativas</h3>
+                                <div className="flex flex-wrap gap-3">
+                                    {product.notes.map(note => (
+                                        <span key={note} className="bg-white/5 border border-white/10 text-gray-300 text-sm font-light px-4 py-2 rounded-lg backdrop-blur-sm">
+                                            {note}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </RevealOnScroll>
+
+                        <RevealOnScroll delay={500}>
+                            <button 
+                                onClick={() => onAddToCart(product, imageRef.current || undefined)} 
+                                className="mt-4 w-full md:w-auto px-12 py-4 bg-brand-gold text-black font-semibold tracking-wide rounded-lg hover:bg-brand-gold-light transition-all duration-300 shadow-gold-glow hover:scale-105 active:scale-95"
+                            >
+                                Adicionar ao Carrinho
+                            </button>
+                        </RevealOnScroll>
                     </div>
-                    <button onClick={() => onAddToCart(product, imageRef.current || undefined)} className="mt-8 w-full bg-brand-gold text-black font-bold py-3 rounded-md hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 shadow-gold-glow active:scale-100">
-                        Adicionar ao Carrinho
-                    </button>
                 </div>
             </div>
         </main>
@@ -272,42 +426,61 @@ const CartPage: React.FC<{ cart: CartItem[], onRemoveFromCart: (id: number) => v
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     return (
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <h1 className="text-4xl font-bold text-center mb-10 text-brand-gold tracking-wide">Seu Carrinho</h1>
+        <main className="container mx-auto px-6 lg:px-12 py-24 min-h-screen max-w-6xl">
+            <RevealOnScroll>
+                <h1 className="text-4xl font-light text-center mb-16 text-white tracking-wide">Sacola de Compras</h1>
+            </RevealOnScroll>
             {cart.length === 0 ? (
-                <p className="text-center text-gray-400">Seu carrinho está vazio.</p>
+                <div className="text-center py-20 glass-panel rounded-2xl">
+                    <p className="text-xl text-gray-400 font-light mb-6">Sua sacola está vazia.</p>
+                    <button onClick={() => onNavigate('products')} className="text-brand-gold hover:text-white border-b border-brand-gold pb-1 transition-colors">Voltar ao catálogo</button>
+                </div>
             ) : (
-                <div className="grid lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 space-y-4">
-                        {cart.map(item => (
-                            <div key={item.id} className="flex items-center bg-gray-900 p-4 rounded-lg border border-gray-800">
-                                <img src={item.image} alt={item.name} className="w-20 h-28 object-cover rounded-md"/>
-                                <div className="ml-4 flex-grow">
-                                    <h2 className="font-semibold text-white">{item.name}</h2>
-                                    <p className="text-sm text-gray-400">{item.brand}</p>
-                                    <p className="text-lg font-bold text-brand-gold mt-1">R$ {item.price.toFixed(2).replace('.', ',')}</p>
+                <div className="grid lg:grid-cols-3 gap-12">
+                    <div className="lg:col-span-2 space-y-6">
+                        {cart.map((item, idx) => (
+                            <RevealOnScroll key={item.id} delay={idx * 100}>
+                                <div className="flex items-center p-6 glass-panel rounded-xl group transition-colors hover:bg-white/5">
+                                    <div className="w-24 h-24 flex-shrink-0 bg-white/5 rounded-lg overflow-hidden">
+                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover mix-blend-overlay opacity-80 group-hover:opacity-100 transition-opacity"/>
+                                    </div>
+                                    <div className="ml-6 flex-grow">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h2 className="font-medium text-white text-lg tracking-wide">{item.name}</h2>
+                                                <p className="text-sm text-brand-gold/80 mt-1">{item.brand}</p>
+                                            </div>
+                                            <p className="text-lg font-light text-white">R$ {item.price.toFixed(2).replace('.', ',')}</p>
+                                        </div>
+                                        <div className="flex justify-between items-end mt-4">
+                                            <p className="text-sm text-gray-500 font-light">Qtd: {item.quantity}</p>
+                                            <button onClick={() => onRemoveFromCart(item.id)} className="text-xs text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider">Remover</button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="text-center">
-                                    <p>Qtd: {item.quantity}</p>
-                                    <button onClick={() => onRemoveFromCart(item.id)} className="text-red-500 hover:text-red-400 text-sm mt-1">Remover</button>
-                                </div>
-                            </div>
+                            </RevealOnScroll>
                         ))}
                     </div>
-                    <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 h-fit">
-                        <h2 className="text-2xl font-bold mb-4">Resumo</h2>
-                        <div className="flex justify-between text-gray-300">
-                            <span>Subtotal</span>
-                            <span>R$ {subtotal.toFixed(2).replace('.', ',')}</span>
+                    <RevealOnScroll delay={300}>
+                        <div className="glass-panel p-8 rounded-2xl sticky top-28">
+                            <h2 className="text-xl font-light text-white mb-8 tracking-wide border-b border-white/10 pb-4">Resumo do Pedido</h2>
+                            <div className="flex justify-between text-gray-400 font-light mb-2">
+                                <span>Subtotal</span>
+                                <span>R$ {subtotal.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-400 font-light mb-6">
+                                <span>Frete</span>
+                                <span className="text-xs text-brand-gold">Calculado no checkout</span>
+                            </div>
+                            <div className="flex justify-between font-medium text-white text-xl mb-8 pt-4 border-t border-white/10">
+                                <span>Total</span>
+                                <span>R$ {subtotal.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                            <button onClick={() => onNavigate('checkout')} className="w-full bg-brand-gold text-black font-semibold py-4 rounded-lg hover:bg-brand-gold-light transition-all duration-300 shadow-gold-glow hover:shadow-gold-glow-lg active:scale-95">
+                            Finalizar Compra
+                            </button>
                         </div>
-                        <div className="flex justify-between font-bold text-white text-lg mt-2">
-                            <span>Total</span>
-                            <span>R$ {subtotal.toFixed(2).replace('.', ',')}</span>
-                        </div>
-                        <button onClick={() => onNavigate('checkout')} className="mt-6 w-full bg-brand-gold text-black font-bold py-3 rounded-md hover:bg-yellow-400 transition-all duration-300 shadow-gold-glow active:scale-95">
-                           Finalizar Compra
-                        </button>
-                    </div>
+                    </RevealOnScroll>
                 </div>
             )}
         </main>
@@ -315,24 +488,28 @@ const CartPage: React.FC<{ cart: CartItem[], onRemoveFromCart: (id: number) => v
 };
 
 const CheckoutPage: React.FC<{ onNavigate: (page: Page) => void }> = ({ onNavigate }) => (
-    <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-2xl">
-        <h1 className="text-4xl font-bold text-center mb-10 text-brand-gold tracking-wide">Checkout</h1>
-        <div className="bg-gray-900 p-8 rounded-lg border border-gray-800 space-y-6">
-            <div>
-                <label className="block text-sm font-medium text-gray-300">Email</label>
-                <input type="email" className="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-brand-gold focus:border-brand-gold text-white p-2" />
+    <main className="container mx-auto px-6 lg:px-12 py-24 min-h-screen flex justify-center items-center">
+        <div className="w-full max-w-2xl glass-panel p-10 rounded-3xl animate-fade-in-up">
+            <h1 className="text-3xl font-light text-center mb-10 text-white tracking-widest uppercase">Checkout</h1>
+            <div className="space-y-6">
+                <div>
+                    <label className="block text-xs font-bold text-brand-gold uppercase tracking-widest mb-2">Email</label>
+                    <input type="email" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all" placeholder="seu@email.com" />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-brand-gold uppercase tracking-widest mb-2">Nome Completo</label>
+                    <input type="text" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all" placeholder="Nome Sobrenome" />
+                </div>
+                <div className="pt-6 pb-2">
+                     <h2 className="text-lg font-medium text-white mb-2">Pagamento</h2>
+                     <div className="p-4 border border-white/10 rounded-lg bg-white/5 text-gray-400 text-sm font-light">
+                        Ambiente seguro. Redirecionando para gateway...
+                     </div>
+                </div>
+                 <button onClick={() => alert('Compra finalizada com sucesso!')} className="mt-4 w-full bg-brand-gold text-black font-bold py-4 rounded-lg hover:bg-brand-gold-light transition-all duration-300 shadow-gold-glow hover:shadow-gold-glow-lg active:scale-95">
+                    Confirmar Pagamento
+                </button>
             </div>
-            <div>
-                <label className="block text-sm font-medium text-gray-300">Nome Completo</label>
-                <input type="text" className="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-brand-gold focus:border-brand-gold text-white p-2" />
-            </div>
-            <div>
-                 <h2 className="text-xl font-semibold text-white mb-4">Pagamento</h2>
-                 <p className="text-gray-400">Funcionalidade de pagamento a ser implementada.</p>
-            </div>
-             <button onClick={() => alert('Compra finalizada com sucesso!')} className="mt-6 w-full bg-brand-gold text-black font-bold py-3 rounded-md hover:bg-yellow-400 transition-all duration-300 shadow-gold-glow active:scale-95">
-                Pagar Agora
-            </button>
         </div>
     </main>
 )
@@ -365,7 +542,7 @@ function App() {
             }
         }
         return initialAppData;
-    } catch (error) {
+    } catch (error: any) {
         console.error("Could not load data from localStorage. Using defaults.", String(error));
         return initialAppData;
     }
@@ -385,8 +562,7 @@ function App() {
   useEffect(() => {
     try {
         localStorage.setItem('appData', JSON.stringify(appData));
-    } catch (error) {
-        // FIX: The caught error is of type 'unknown' and must be converted to a string before being passed to console.error.
+    } catch (error: any) {
         console.error(`Could not save data to localStorage: ${String(error)}`);
     }
   }, [appData]);
@@ -402,8 +578,7 @@ function App() {
           setCurrentUser(null);
         }
       }
-    } catch (error) {
-      // FIX: The caught error is of type 'unknown' and must be converted to a string before being passed to console.error.
+    } catch (error: any) {
       console.error(`Failed to parse user data from localStorage: ${String(error)}`);
     }
   }, []);
@@ -432,7 +607,7 @@ function App() {
     setFilters(initialFilters);
     setPage(newPage);
     setPageParam(param);
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   const handleViewProduct = (product: Product) => {
@@ -514,14 +689,9 @@ function App() {
 
   const handleUpdateAllPrices = (newPrice: number) => {
     setAppData(currentAppData => {
-        // Create a new array of products with the updated price.
-        // This ensures immutability, which is key for React to detect changes reliably.
         const updatedProducts = currentAppData.products.map(product => {
-            // Create a new product object for each item.
             return { ...product, price: newPrice };
         });
-
-        // Return a completely new state object with the updated products.
         return {
             ...currentAppData,
             products: updatedProducts
@@ -580,7 +750,7 @@ function App() {
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen text-gray-200">
       <Header 
         cartItemCount={cartItemCount} 
         onNavigate={handleNavigate}
@@ -590,7 +760,7 @@ function App() {
         cartIconRef={cartIconRef}
         siteSettings={appData.siteSettings}
       />
-      <div key={page + (pageParam || '')} className="flex-grow animate-fade-in">
+      <div key={page + (pageParam || '')} className="flex-grow">
         {renderPage()}
       </div>
       <Footer onAdminLoginClick={() => setAuthModalOpen(true)} />

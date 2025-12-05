@@ -1,41 +1,59 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
   <head>
-    <meta charset="UTF-ag" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Heein Fragrâncias - Essências dos melhores perfumes do mundo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
               'brand-gold': '#CDAA00',
-              'brand-dark': '#0a0a0a',
+              'brand-gold-light': '#F2E394',
+              'brand-dark': '#050505',
+              'glass': 'rgba(255, 255, 255, 0.05)',
+              'glass-dark': 'rgba(0, 0, 0, 0.4)',
             },
             fontFamily: {
               'sans': ['Montserrat', 'sans-serif'],
             },
             boxShadow: {
-              'gold-glow': '0 0 15px rgba(205, 170, 0, 0.6)',
-              'gold-glow-lg': '0 0 25px rgba(205, 170, 0, 0.7)',
+              'gold-glow': '0 0 20px rgba(205, 170, 0, 0.3)',
+              'gold-glow-lg': '0 0 40px rgba(205, 170, 0, 0.4)',
+              'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+            },
+            backgroundImage: {
+              'gold-gradient': 'linear-gradient(135deg, #CDAA00 0%, #F2E394 50%, #CDAA00 100%)',
+              'dark-gradient': 'linear-gradient(to bottom, rgba(0,0,0,0.2), #050505)',
             },
             keyframes: {
               fadeIn: {
                 'from': { opacity: '0' },
                 'to': { opacity: '1' },
               },
-              fadeInRight: {
-                'from': { opacity: '0', transform: 'translateX(20px)' },
-                'to': { opacity: '1', transform: 'translateX(0)' },
+              fadeInUp: {
+                'from': { opacity: '0', transform: 'translateY(30px)' },
+                'to': { opacity: '1', transform: 'translateY(0)' },
               },
+              scrollX: {
+                'from': { transform: 'translateX(0)' },
+                'to': { transform: 'translateX(-50%)' },
+              },
+              shimmer: {
+                '0%': { backgroundPosition: '-200% center' },
+                '100%': { backgroundPosition: '200% center' },
+              }
             },
             animation: {
-              'fade-in': 'fadeIn 0.4s ease-in-out',
-              'fade-in-right': 'fadeInRight 0.5s ease-out forwards',
+              'fade-in': 'fadeIn 0.6s ease-in-out',
+              'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'scroll-x': 'scrollX 40s linear infinite',
+              'shimmer': 'shimmer 3s linear infinite',
             },
           }
         }
@@ -43,35 +61,68 @@
     </script>
     <style>
       body {
+        background-color: #050505;
+        overflow-x: hidden;
+      }
+      
+      /* Cinematic Background Overlay */
+      .bg-fixed-layer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
         background-image: url('https://i.imgur.com/SxlhJlF.jpeg');
         background-size: cover;
         background-position: center;
-        background-attachment: fixed;
         background-repeat: no-repeat;
       }
-      /* Hide scrollbar for Chrome, Safari and Opera */
-      .hide-scrollbar::-webkit-scrollbar {
-          display: none;
+      
+      .bg-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, #050505 100%);
+        backdrop-filter: blur(3px);
       }
 
-      /* Hide scrollbar for IE, Edge and Firefox */
-      .hide-scrollbar {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
       }
-      
-      /* Styles for auto-scroll carousel */
-      @keyframes scroll-x {
-        from { transform: translateX(0); }
-        to { transform: translateX(-50%); } /* Scroll halfway for seamless loop with duplicated items */
+      ::-webkit-scrollbar-track {
+        background: #0a0a0a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #CDAA00;
       }
 
-      .animate-scroll-x {
-        /* Adjust duration based on the number of items. ~5s per item for 8 items */
-        animation: scroll-x 40s linear infinite;
+      /* Selection Color */
+      ::selection {
+        background: rgba(205, 170, 0, 0.3);
+        color: white;
       }
       
-      .group:hover .pause-animation {
+      .text-shadow-sm {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      
+      .pause-animation {
         animation-play-state: paused;
       }
     </style>
@@ -87,7 +138,9 @@
 }
 </script>
 </head>
-  <body class="bg-brand-dark text-white font-sans">
+  <body class="text-white font-sans antialiased">
+    <div class="bg-fixed-layer"></div>
+    <div class="bg-overlay"></div>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
